@@ -1,0 +1,132 @@
+<?php
+
+
+$transacciones = [];
+
+function registrarTransaccion($id, $descripcion, $monto){
+    global $transacciones;
+
+    $transaccion = [
+        "id" => $id,
+        "descripcion" => $descripcion,
+        "monto" => $monto
+    ];
+
+    array_push($transacciones, $transaccion);
+}
+
+
+function generarEstadoDeCuenta(){
+    global $transacciones;
+
+    $totalContado = 0;
+    $estado = "===== ESTADO DE CUENTA =====\n\n";
+    $estado .= "Transacciones registradas:\n";
+
+    echo "<table>";
+    echo "<tr><th>ID</th><th>Descripción</th><th>Monto</th></tr>";
+
+    foreach($transacciones as $t){
+
+        echo "<tr>";
+        echo "<td>".$t["id"]."</td>";
+        echo "<td>".$t["descripcion"]."</td>";
+        echo "<td>₡".$t["monto"]."</td>";
+        echo "</tr>";
+
+        $estado .= "ID: ".$t["id"]." - ".$t["descripcion"]." - ₡".$t["monto"]."\n";
+
+        $totalContado += $t["monto"];
+    }
+
+    echo "</table>";
+
+
+    $interes = $totalContado * 0.026;
+    $totalConInteres = $totalContado + $interes;
+
+    $cashback = $totalContado * 0.001;
+
+    $montoFinal = $totalConInteres - $cashback;
+
+    $estado .= "\n RESUMEN \n";
+    $estado .= "Total de contado: ₡".$totalContado."\n";
+    $estado .= "Total con interés (2.6%): ₡".$totalConInteres."\n";
+    $estado .= "Cashback (0.1%): ₡".$cashback."\n";
+    $estado .= "Monto final a pagar: ₡".$montoFinal."\n";
+
+    echo "<div class='resumen'>";
+    echo "<p><strong>Total de contado:</strong> ₡".$totalContado."</p>";
+    echo "<p><strong>Total con interés (2.6%):</strong> ₡".$totalConInteres."</p>";
+    echo "<p><strong>Cashback (0.1%):</strong> ₡".$cashback."</p>";
+    echo "<p><strong>Monto final a pagar:</strong> ₡".$montoFinal."</p>";
+    echo "</div>";
+
+    file_put_contents("estado_cuenta.txt", $estado);
+}
+
+
+registrarTransaccion(1, "Compra en supermercado", 25000);
+registrarTransaccion(2, "Pago de gasolina", 18000);
+registrarTransaccion(3, "Restaurante", 12000);
+registrarTransaccion(4, "Compra en tienda online", 30000);
+
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Estado de Cuenta</title>
+
+<style>
+
+body{
+    font-family: Arial;
+    background:#f4f6f9;
+    padding:40px;
+}
+
+h1{
+    text-align:center;
+}
+
+table{
+    width:60%;
+    margin:auto;
+    border-collapse: collapse;
+    background:white;
+}
+
+th,td{
+    padding:10px;
+    border:1px solid #ccc;
+    text-align:center;
+}
+
+th{
+    background:#2c3e50;
+    color:white;
+}
+
+.resumen{
+    width:60%;
+    margin:20px auto;
+    background:white;
+    padding:15px;
+    border:1px solid #ccc;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Estado de Cuenta Tarjeta de Crédito</h1>
+
+<?php
+generarEstadoDeCuenta();
+?>
+
+</body>
+</html>
